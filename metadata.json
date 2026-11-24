@@ -1,0 +1,6 @@
+{
+  "name": "Momo",
+  "description": "Aplikasi Android native untuk Momo AI: bot kustom terkunci, chat streaming SSE, Studio Pelukis, galeri gambar, dan paket QRIS.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

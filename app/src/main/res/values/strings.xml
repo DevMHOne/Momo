@@ -1,0 +1,76 @@
+<resources>
+    <string name="app_name">Momo</string>
+
+    <!-- Navigation -->
+    <string name="nav_bot">Bot</string>
+    <string name="nav_chat">Chat</string>
+    <string name="nav_galeri">Galeri</string>
+    <string name="nav_akun">Akun</string>
+
+    <!-- Auth -->
+    <string name="auth_title_login">Masuk ke Momo</string>
+    <string name="auth_title_register">Buat Akun Momo</string>
+    <string name="auth_subtitle">Asisten AI &amp; Studio Pelukis native untuk Android</string>
+    <string name="auth_name_label">Nama Lengkap</string>
+    <string name="auth_email_label">Email</string>
+    <string name="auth_password_label">Kata Sandi</string>
+    <string name="auth_btn_login">Masuk</string>
+    <string name="auth_btn_register">Daftar Sekarang</string>
+    <string name="auth_switch_to_register">Belum punya akun? Daftar</string>
+    <string name="auth_switch_to_login">Sudah punya akun? Masuk</string>
+    <string name="auth_logout">Keluar Akun</string>
+
+    <!-- Quota -->
+    <string name="quota_5h_title">Sesi 5 Jam</string>
+    <string name="quota_weekly_title">Mingguan (Akumulatif)</string>
+    <string name="quota_image_title">Saldo Kuota Gambar</string>
+    <string name="quota_image_subtitle">Tidak reset berkala</string>
+
+    <!-- Bot -->
+    <string name="bot_screen_title">Bot Anda</string>
+    <string name="bot_create_action">Buat Bot</string>
+    <string name="bot_edit_title">Edit Bot</string>
+    <string name="bot_create_title">Buat Bot Baru</string>
+    <string name="bot_name_label">Nama Bot</string>
+    <string name="bot_job_label">Peran / Instruksi Singkat</string>
+    <string name="bot_look_label">Tipe Bot (Terkunci setelah dibuat)</string>
+    <string name="bot_look_locked_hint">Tipe bot terkunci permanen setelah dibuat.</string>
+    <string name="bot_empty_title">Belum ada bot kustom</string>
+    <string name="bot_empty_subtitle">Buat bot pertama Anda untuk mulai Chat atau melukis di Studio Pelukis.</string>
+
+    <!-- Chat & Studio Pelukis -->
+    <string name="chat_mode_studio">Studio Pelukis</string>
+    <string name="chat_mode_chat">Mode Chat</string>
+    <string name="chat_input_placeholder">Tulis pesan untuk %1$s…</string>
+    <string name="studio_input_placeholder">Deskripsikan gambar yang ingin dilukis…</string>
+    <string name="chat_send_cd">Kirim pesan</string>
+    <string name="chat_stop_cd">Hentikan respons</string>
+    <string name="chat_attach_cd">Tambah lampiran</string>
+    <string name="chat_new_session_cd">Percakapan baru</string>
+    <string name="chat_limit_cta">Lihat Paket</string>
+
+    <!-- Gallery -->
+    <string name="gallery_title">Galeri Gambar</string>
+    <string name="gallery_empty_title">Galeri masih kosong</string>
+    <string name="gallery_empty_subtitle">Gunakan bot Pelukis untuk menghasilkan karya gambar AI pertama Anda.</string>
+    <string name="gallery_download_btn">Unduh ke HP Android</string>
+    <string name="gallery_share_btn">Bagikan</string>
+
+    <!-- Account & Plans -->
+    <string name="account_title">Akun &amp; Paket</string>
+    <string name="theme_label">Tampilan Tema</string>
+    <string name="theme_dark">Matte Charcoal</string>
+    <string name="theme_light">Precision Porcelain</string>
+    <string name="plans_title">Pilihan Paket</string>
+    <string name="qris_title">Pembayaran QRIS</string>
+    <string name="qris_save_btn">Simpan QR ke Galeri</string>
+    <string name="qris_waiting">Menunggu pembayaran otomatis terverifikasi…</string>
+    <string name="qris_paid">Pembayaran berhasil! Paket aktif.</string>
+
+    <!-- Accessibility -->
+    <string name="cd_toggle_theme">Ganti tema gelap atau terang</string>
+    <string name="cd_refresh">Muat ulang data</string>
+    <string name="cd_close">Tutup</string>
+    <string name="cd_back">Kembali</string>
+    <string name="cd_momo_hero">Ilustrasi tajuk Momo AI</string>
+</resources>
