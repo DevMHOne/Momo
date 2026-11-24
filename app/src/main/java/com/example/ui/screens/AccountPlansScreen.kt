@@ -31,7 +31,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Logout
+import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.DarkMode
@@ -40,6 +42,7 @@ import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material.icons.rounded.QrCode2
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Verified
+import androidx.compose.material.icons.rounded.WorkspacePremium
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -96,6 +99,7 @@ fun AccountPlansScreen(
     modifier: Modifier = Modifier
 ) {
     val extra = LocalMomoExtraColors.current
+    var showPlansPopup by remember { mutableStateOf(false) }
     var downgradeTarget by remember { mutableStateOf<MomoPlan?>(null) }
 
     Column(
@@ -143,8 +147,8 @@ fun AccountPlansScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // User Profile & Theme Card
             uiState.user?.let { user ->
+                // Profile & Theme Card
                 item(key = "profile_card") {
                     Surface(
                         modifier = Modifier.fillMaxWidth(),
@@ -190,15 +194,31 @@ fun AccountPlansScreen(
                                     )
                                 }
                                 Surface(
+                                    onClick = { showPlansPopup = true },
                                     shape = RoundedCornerShape(999.dp),
-                                    color = MaterialTheme.colorScheme.primaryContainer
+                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)),
+                                    modifier = Modifier
+                                        .minimumInteractiveComponentSize()
+                                        .testTag("profile_plan_popup_pill")
                                 ) {
-                                    Text(
-                                        text = user.quota.planName,
-                                        style = MaterialTheme.typography.labelMedium,
-                                        color = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
-                                    )
+                                    Row(
+                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text(
+                                            text = user.quota.planName,
+                                            style = MaterialTheme.typography.labelMedium,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                        Icon(
+                                            imageVector = Icons.Rounded.ChevronRight,
+                                            contentDescription = "Lihat pilihan paket",
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
                                 }
                             }
 
@@ -253,55 +273,77 @@ fun AccountPlansScreen(
                     QuotaOverviewCard(
                         quota = user.quota,
                         nowMs = uiState.nowMs,
-                        compact = false
+                        compact = false,
+                        onPlanClick = { showPlansPopup = true }
                     )
                 }
-            }
 
-            item(key = "plans_header") {
-                Text(
-                    text = stringResource(R.string.plans_title),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-            }
-
-            if (uiState.isPlansLoading && uiState.plans.isEmpty()) {
-                item(key = "plans_loading") {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 32.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-                    }
-                }
-            } else if (uiState.plans.isEmpty()) {
-                item(key = "plans_empty") {
+                // Paket Langganan Launcher Card (Pop-up trigger button — NO inline plans list)
+                item(key = "plans_launcher_card") {
                     Surface(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(18.dp),
+                        shape = RoundedCornerShape(22.dp),
                         color = MaterialTheme.colorScheme.surface,
                         border = BorderStroke(1.dp, extra.cardBorder)
                     ) {
-                        Text(
-                            text = "Daftar paket belum tersedia saat ini. Ketuk tombol muat ulang di kanan atas.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(18.dp)
-                        )
+                        Column(
+                            modifier = Modifier.padding(18.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(44.dp)
+                                        .clip(RoundedCornerShape(14.dp))
+                                        .background(MaterialTheme.colorScheme.primaryContainer),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.WorkspacePremium,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(22.dp)
+                                    )
+                                }
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = stringResource(R.string.plans_title),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Text(
+                                        text = "Paket aktif: ${user.quota.planName} · Upgrade via QRIS atau kelola paket",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+
+                            Button(
+                                onClick = { showPlansPopup = true },
+                                shape = RoundedCornerShape(14.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
+                                ),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(50.dp)
+                                    .testTag("open_plans_popup_button")
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.AutoAwesome,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Lihat & Pilih Paket", style = MaterialTheme.typography.labelLarge)
+                            }
+                        }
                     }
-                }
-            } else {
-                items(uiState.plans, key = { it.id }) { plan ->
-                    PlanCardItem(
-                        plan = plan,
-                        isBusy = uiState.isPlanActionBusy,
-                        onUpgradeQris = { onUpgradeQris(plan) },
-                        onDowngradeFree = { downgradeTarget = plan }
-                    )
                 }
             }
 
@@ -330,6 +372,26 @@ fun AccountPlansScreen(
         }
     }
 
+    if (showPlansPopup) {
+        PlansPopupDialog(
+            plans = uiState.plans,
+            currentPlanId = uiState.user?.quota?.planId.orEmpty(),
+            currentPlanName = uiState.user?.quota?.planName.orEmpty(),
+            isLoading = uiState.isPlansLoading,
+            isBusy = uiState.isPlanActionBusy,
+            onRefresh = onRefresh,
+            onUpgradeQris = { plan ->
+                showPlansPopup = false
+                onUpgradeQris(plan)
+            },
+            onRequestDowngrade = { plan ->
+                showPlansPopup = false
+                downgradeTarget = plan
+            },
+            onDismiss = { showPlansPopup = false }
+        )
+    }
+
     downgradeTarget?.let { plan ->
         AlertDialog(
             onDismissRequest = { downgradeTarget = null },
@@ -346,7 +408,7 @@ fun AccountPlansScreen(
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
-                    Text("Ya, Ubah Paket")
+                    Text("Ya, Aktifkan")
                 }
             },
             dismissButton = {
@@ -370,8 +432,160 @@ fun AccountPlansScreen(
 }
 
 @Composable
-private fun PlanCardItem(
+private fun PlansPopupDialog(
+    plans: List<MomoPlan>,
+    currentPlanId: String,
+    currentPlanName: String,
+    isLoading: Boolean,
+    isBusy: Boolean,
+    onRefresh: () -> Unit,
+    onUpgradeQris: (MomoPlan) -> Unit,
+    onRequestDowngrade: (MomoPlan) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val extra = LocalMomoExtraColors.current
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xC2000000))
+                .padding(horizontal = 16.dp, vertical = 24.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 680.dp)
+                    .navigationBarsPadding()
+                    .testTag("plans_popup_dialog"),
+                shape = RoundedCornerShape(24.dp),
+                color = MaterialTheme.colorScheme.surface,
+                border = BorderStroke(1.dp, extra.cardBorder)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(18.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.plans_title),
+                                style = MaterialTheme.typography.headlineSmall,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = "Pilih paket yang sesuai lalu tekan tombol di bawah kartu",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        IconButton(
+                            onClick = onRefresh,
+                            modifier = Modifier
+                                .minimumInteractiveComponentSize()
+                                .testTag("plans_popup_refresh")
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Refresh,
+                                contentDescription = stringResource(R.string.cd_refresh),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        IconButton(
+                            onClick = onDismiss,
+                            modifier = Modifier
+                                .minimumInteractiveComponentSize()
+                                .testTag("plans_popup_close")
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Close,
+                                contentDescription = stringResource(R.string.cd_close),
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+
+                    HorizontalDivider(color = extra.cardBorder, thickness = 1.dp)
+
+                    when {
+                        isLoading && plans.isEmpty() -> {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                            }
+                        }
+                        plans.isEmpty() -> {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 28.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Daftar paket belum tersedia. Ketuk tombol muat ulang di kanan atas.",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                        else -> {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f, fill = false),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                items(plans, key = { it.id }) { plan ->
+                                    val isCurrent = plan.isCurrent ||
+                                        (currentPlanId.isNotBlank() && plan.id.equals(currentPlanId, ignoreCase = true)) ||
+                                        (currentPlanName.isNotBlank() && plan.name.equals(currentPlanName, ignoreCase = true))
+                                    PopupPlanCardItem(
+                                        plan = plan,
+                                        isCurrent = isCurrent,
+                                        isBusy = isBusy,
+                                        onUpgradeQris = { onUpgradeQris(plan) },
+                                        onDowngradeFree = { onRequestDowngrade(plan) }
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    OutlinedButton(
+                        onClick = onDismiss,
+                        shape = RoundedCornerShape(14.dp),
+                        border = BorderStroke(1.dp, extra.cardBorder),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .testTag("plans_popup_dismiss_button")
+                    ) {
+                        Text("Tutup")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PopupPlanCardItem(
     plan: MomoPlan,
+    isCurrent: Boolean,
     isBusy: Boolean,
     onUpgradeQris: () -> Unit,
     onDowngradeFree: () -> Unit
@@ -383,15 +597,19 @@ private fun PlanCardItem(
         modifier = Modifier
             .fillMaxWidth()
             .testTag("plan_card_${plan.id}"),
-        shape = RoundedCornerShape(22.dp),
-        color = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(20.dp),
+        color = if (isCurrent) {
+            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.28f)
+        } else {
+            MaterialTheme.colorScheme.background
+        },
         border = BorderStroke(
-            width = if (plan.isCurrent) 1.5.dp else 1.dp,
-            color = if (plan.isCurrent) MaterialTheme.colorScheme.primary else extra.cardBorder
+            width = if (isCurrent) 1.5.dp else 1.dp,
+            color = if (isCurrent) MaterialTheme.colorScheme.primary else extra.cardBorder
         )
     ) {
         Column(
-            modifier = Modifier.padding(18.dp),
+            modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Row(
@@ -451,10 +669,12 @@ private fun PlanCardItem(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                PlanMetricChip(
-                    label = "${plan.imageQuota} kuota gambar",
-                    modifier = Modifier.weight(1f)
-                )
+                if (plan.imageQuota > 0) {
+                    PlanMetricChip(
+                        label = "${plan.imageQuota} kuota gambar",
+                        modifier = Modifier.weight(1f)
+                    )
+                }
                 PlanMetricChip(
                     label = "Maks ${plan.maxBots} bot",
                     modifier = Modifier.weight(1f)
@@ -487,67 +707,71 @@ private fun PlanCardItem(
                 }
             }
 
-            if (plan.isCurrent) {
-                Surface(
-                    shape = RoundedCornerShape(14.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 12.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
+            when {
+                isCurrent -> {
+                    Surface(
+                        shape = RoundedCornerShape(14.dp),
+                        color = extra.success.copy(alpha = 0.14f),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Verified,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "Paket Aktif Saat Ini",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 12.dp),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Verified,
+                                contentDescription = null,
+                                tint = extra.success,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "Paket Aktif Saat Ini",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = extra.success
+                            )
+                        }
                     }
                 }
-            } else if (isPaid) {
-                Button(
-                    onClick = onUpgradeQris,
-                    enabled = !isBusy,
-                    shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                        .testTag("upgrade_qris_${plan.id}")
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.QrCode2,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Upgrade via QRIS", style = MaterialTheme.typography.labelLarge)
+                isPaid -> {
+                    Button(
+                        onClick = onUpgradeQris,
+                        enabled = !isBusy,
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                            .testTag("upgrade_qris_${plan.id}")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.QrCode2,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Upgrade via QRIS", style = MaterialTheme.typography.labelLarge)
+                    }
                 }
-            } else {
-                OutlinedButton(
-                    onClick = onDowngradeFree,
-                    enabled = !isBusy,
-                    shape = RoundedCornerShape(14.dp),
-                    border = BorderStroke(1.dp, extra.cardBorder),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                        .testTag("downgrade_free_${plan.id}")
-                ) {
-                    Text("Pilih Paket ${plan.name}", style = MaterialTheme.typography.labelLarge)
+                else -> {
+                    OutlinedButton(
+                        onClick = onDowngradeFree,
+                        enabled = !isBusy,
+                        shape = RoundedCornerShape(14.dp),
+                        border = BorderStroke(1.dp, extra.cardBorder),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                            .testTag("downgrade_free_${plan.id}")
+                    ) {
+                        Text("Pilih Paket ${plan.name}", style = MaterialTheme.typography.labelLarge)
+                    }
                 }
             }
         }

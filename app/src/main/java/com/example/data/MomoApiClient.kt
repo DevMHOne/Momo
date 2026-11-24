@@ -288,17 +288,27 @@ class MomoApiClient(private val context: Context) {
                     obj.has("amount") -> obj.optLong("amount", 0L)
                     else -> 0L
                 }
-                val imageQuota = when {
-                    obj.has("imageLimit") -> obj.optInt("imageLimit", 0)
-                    obj.has("imageQuota") -> obj.optInt("imageQuota", 0)
-                    obj.has("images") -> obj.optInt("images", 0)
-                    else -> 0
-                }
-                val maxBots = when {
-                    obj.has("maxBots") -> obj.optInt("maxBots", 1)
-                    obj.has("botLimit") -> obj.optInt("botLimit", 1)
-                    else -> 1
-                }
+                val nestedQuota = obj.optJSONObject("quota") ?: obj.optJSONObject("limits")
+                val imageQuota = listOf(
+                    obj.optInt("imageLimit", -1),
+                    obj.optInt("imageQuota", -1),
+                    obj.optInt("images", -1),
+                    obj.optInt("imageAllowance", -1),
+                    obj.optInt("imageCredits", -1),
+                    obj.optInt("imageCredit", -1),
+                    obj.optInt("monthlyImages", -1),
+                    obj.optInt("image_limit", -1),
+                    obj.optInt("image_quota", -1),
+                    nestedQuota?.optInt("imageLimit", -1) ?: -1,
+                    nestedQuota?.optInt("imageQuota", -1) ?: -1
+                ).firstOrNull { it >= 0 } ?: 0
+                val maxBots = listOf(
+                    obj.optInt("maxBots", -1),
+                    obj.optInt("botLimit", -1),
+                    obj.optInt("bots", -1),
+                    obj.optInt("max_bots", -1),
+                    nestedQuota?.optInt("maxBots", -1) ?: -1
+                ).firstOrNull { it > 0 } ?: 1
                 val isCurrent = obj.optBoolean("isCurrent", false) ||
                     (currentPlanId.isNotBlank() && id.equals(currentPlanId, ignoreCase = true)) ||
                     (currentPlanName.isNotBlank() && name.equals(currentPlanName, ignoreCase = true))

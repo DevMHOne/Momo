@@ -168,6 +168,7 @@ fun QuotaOverviewCard(
     quota: MomoQuota,
     nowMs: Long,
     compact: Boolean = false,
+    onPlanClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val extra = LocalMomoExtraColors.current
@@ -182,7 +183,18 @@ fun QuotaOverviewCard(
             verticalArrangement = Arrangement.spacedBy(if (compact) 12.dp else 16.dp)
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(
+                        if (onPlanClick != null) {
+                            Modifier
+                                .clip(RoundedCornerShape(10.dp))
+                                .clickable(onClick = onPlanClick)
+                                .padding(vertical = 4.dp)
+                        } else {
+                            Modifier
+                        }
+                    ),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
